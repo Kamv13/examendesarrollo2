@@ -12,14 +12,24 @@ export function ChartProvider({ children }: View) {
 
 
     useEffect(() => {
-        Promise.all([
-            fetch(`${API}/api/charts/avg-price-by-category`).then(res => res.json()),
-            fetch(`${API}/api/charts/products-by-brand`).then(res => res.json()),
-        ]).then(([catData, brandData]) => {
-            setAvgPriceByCategory(catData.data);
-            setProductsByBrand(brandData.data);
-        });
-    }, []);
+    Promise.all([
+      fetch(`${API}/api/charts/avg-price-by-category`).then(res => res.json()),
+      fetch(`${API}/api/charts/products-by-brand`).then(res => res.json()),
+    ]).then(([catData, brandData]) => {
+      setAvgPriceByCategory(
+        catData.data.map((item: AvgPriceByCategory) => ({
+          ...item,
+          category_code: item.category_code || "Sin Categoria",
+        }))
+      );
+      setProductsByBrand(
+        brandData.data.map((item: ProductsByBrand) => ({
+          ...item,
+          brand_code: item.brand_code || "Sin Marca",
+        }))
+      );
+    });
+  }, []);
 
     return (
         <ChartContext.Provider value={{ avgPriceByCategory, productsByBrand }}>
